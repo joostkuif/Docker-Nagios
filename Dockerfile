@@ -1,5 +1,5 @@
 FROM ubuntu:16.04
-MAINTAINER Jason Rivers <jason@jasonrivers.co.uk>
+MAINTAINER Joost Kuif <joost.kuif@gmail.com>
 
 ENV NAGIOS_HOME            /opt/nagios
 ENV NAGIOS_USER            nagios
@@ -21,11 +21,24 @@ ENV NAGIOS_BRANCH          nagios-4.4.5
 ENV NAGIOS_PLUGINS_BRANCH  release-2.2.1
 ENV NRPE_BRANCH            nrpe-3.2.1
 
-
 RUN echo postfix postfix/main_mailer_type string "'Internet Site'" | debconf-set-selections  && \
     echo postfix postfix/mynetworks string "127.0.0.0/8" | debconf-set-selections            && \
-    echo postfix postfix/mailname string ${NAGIOS_FQDN} | debconf-set-selections             && \
-    apt-get update && apt-get install -y    \
+    echo postfix postfix/mailname string ${NAGIOS_FQDN} | debconf-set-selections
+
+#haal sources uit NL (bit.nl)
+RUN echo "###### Ubuntu Main Repos" > /etc/apt/sources.list && \
+    echo "deb http://nl.archive.ubuntu.com/ubuntu/ xenial main restricted universe multiverse" > /etc/apt/sources.list && \
+    echo "deb-src http://nl.archive.ubuntu.com/ubuntu/ xenial main restricted universe multiverse" >> /etc/apt/sources.list && \
+    echo "###### Ubuntu Update Repos" >> /etc/apt/sources.list && \
+    echo "deb http://nl.archive.ubuntu.com/ubuntu/ xenial-security main restricted universe multiverse" >> /etc/apt/sources.list && \
+    echo "deb http://nl.archive.ubuntu.com/ubuntu/ xenial-updates main restricted universe multiverse" >> /etc/apt/sources.list && \
+    echo "deb-src http://nl.archive.ubuntu.com/ubuntu/ xenial-security main restricted universe multiverse" >> /etc/apt/sources.list && \
+    echo "deb-src http://nl.archive.ubuntu.com/ubuntu/ xenial-updates main restricted universe multiverse" >> /etc/apt/sources.list && \
+    apt-get update
+
+RUN apt-get install -y apt-utils
+
+RUN apt-get install -y    \
         apache2                             \
         apache2-utils                       \
         autoconf                            \
@@ -79,8 +92,7 @@ RUN echo postfix postfix/main_mailer_type string "'Internet Site'" | debconf-set
         snmp-mibs-downloader                \
         unzip                               \
         python                              \
-                                                && \
-    apt-get clean && rm -Rf /var/lib/apt/lists/*
+        lsb-release gnupg libc6 libyaml-perl alien libaio1
 
 RUN ( egrep -i "^${NAGIOS_GROUP}"    /etc/group || groupadd $NAGIOS_GROUP    )                         && \
     ( egrep -i "^${NAGIOS_CMDGROUP}" /etc/group || groupadd $NAGIOS_CMDGROUP )
@@ -180,6 +192,14 @@ RUN export DOC_ROOT="DocumentRoot $(echo $NAGIOS_HOME/share)"                   
     sed -i "s,</VirtualHost>,<IfDefine ENABLE_USR_LIB_CGI_BIN>\nScriptAlias /cgi-bin/ ${NAGIOS_HOME}/sbin/\n</IfDefine>\n</VirtualHost>," /etc/apache2/sites-enabled/000-default.conf  && \
     ln -s /etc/apache2/mods-available/cgi.load /etc/apache2/mods-enabled/cgi.load
 
+#apache ssl
+RUN cp /etc/apache2/sites-available/default-ssl.conf /etc/apache2/sites-enabled/ssl.conf                    && \
+    export DOC_ROOT="DocumentRoot $(echo $NAGIOS_HOME/share)"                                               && \
+    sed -i "s,ServerAdmin.*,joost.kuif@gmail.com," /etc/apache2/sites-enabled/ssl.conf                && \
+    sed -i "s,DocumentRoot.*,$DOC_ROOT," /etc/apache2/sites-enabled/ssl.conf                                && \
+    sed -i "s,SSLCertificateFile.*,/opt/nagios/etc/ssl-cert.pem," /etc/apache2/sites-enabled/ssl.conf      && \
+    sed -i "s,SSLCertificateKeyFile.*,/opt/nagios/etc/ssl-cert.key," /etc/apache2/sites-enabled/ssl.conf
+
 RUN mkdir -p -m 0755 /usr/share/snmp/mibs                     && \
     mkdir -p         ${NAGIOS_HOME}/etc/conf.d                && \
     mkdir -p         ${NAGIOS_HOME}/etc/monitor               && \
@@ -214,7 +234,8 @@ RUN a2enmod session         && \
     a2enmod session_cookie  && \
     a2enmod session_crypto  && \
     a2enmod auth_form       && \
-    a2enmod request
+    a2enmod request         && \
+    a2enmod ldap
 
 RUN chmod +x /usr/local/bin/start_nagios        && \
     chmod +x /etc/sv/apache/run                 && \
@@ -240,8 +261,21 @@ RUN echo "ServerName ${NAGIOS_FQDN}" > /etc/apache2/conf-available/servername.co
     ln -s /etc/apache2/conf-available/servername.conf /etc/apache2/conf-enabled/servername.conf    && \
     ln -s /etc/apache2/conf-available/timezone.conf /etc/apache2/conf-enabled/timezone.conf
 
-EXPOSE 80
 
 VOLUME "${NAGIOS_HOME}/var" "${NAGIOS_HOME}/etc" "/var/log/apache2" "/opt/Custom-Nagios-Plugins" "/opt/nagiosgraph/var" "/opt/nagiosgraph/etc"
+
+#In deze oracleinstall worden ook packages geinstaleerd maar daar falen ze, ze zijn daarom in de grote apt-get install (bovenin dit script) toegevoegd
+RUN cd /opt/oracle                                                                         && \
+    wget https://assets.nagios.com/downloads/general/scripts/oracleinstall.sh              && \
+    chmod +x oracleinstall.sh
+
+RUN cd /opt/oracle                                                                         && \
+    bash ./oracleinstall.sh
+
+RUN apt-get upgrade -y
+
+RUN apt-get clean && rm -Rf /var/lib/apt/lists/*
+
+EXPOSE 80 443
 
 CMD [ "/usr/local/bin/start_nagios" ]
