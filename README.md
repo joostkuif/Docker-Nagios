@@ -13,7 +13,7 @@ NagiosGraph configuration lives in /opt/nagiosgraph/etc
 ### Install
 
 ```sh
-docker pull jasonrivers/nagios:latest
+docker pull joostkuif/nagios:latest
 ```
 
 ### Running
@@ -21,7 +21,7 @@ docker pull jasonrivers/nagios:latest
 Run with the example configuration with the following:
 
 ```sh
-docker run --name nagios4 -p 0.0.0.0:8080:80 jasonrivers/nagios:latest
+docker run --name nagios4 -p 0.0.0.0:8080:80 joostkuif/nagios:latest
 ```
 
 alternatively you can use external Nagios configuration & log data with the following:
@@ -57,7 +57,7 @@ The default credentials for the web interface is `nagiosadmin` / `nagios`
 
 * Nagios nrpe [<http://exchange.nagios.org/directory/Addons/Monitoring-Agents/NRPE--2D-Nagios-Remote-Plugin-Executor/details>]
 * Nagiosgraph [<http://exchange.nagios.org/directory/Addons/Graphing-and-Trending/nagiosgraph/details>]
-* JR-Nagios-Plugins -  custom plugins I've created [<https://github.com/JasonRivers/nagios-plugins>]
+* JR-Nagios-Plugins -  custom plugins from Jason Rivers [<https://github.com/JasonRivers/nagios-plugins>]
 * WL-Nagios-Plugins -  custom plugins from William Leibzon [<https://github.com/willixix/WL-NagiosPlugins>]
 * JE-Nagios-Plugins -  custom plugins from Justin Ellison [<https://github.com/justintime/nagios-plugins>]
 
