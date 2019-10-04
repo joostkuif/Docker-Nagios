@@ -13,7 +13,7 @@ NagiosGraph configuration lives in /opt/nagiosgraph/etc
 ### Install
 
 ```sh
-docker pull joostkuif/nagios:latest
+docker pull jkuif/nagios:latest
 ```
 
 ### Running
@@ -21,7 +21,7 @@ docker pull joostkuif/nagios:latest
 Run with the example configuration with the following:
 
 ```sh
-docker run --name nagios4 -p 0.0.0.0:8080:80 joostkuif/nagios:latest
+docker run --name nagios4 -p 0.0.0.0:80:80 -p 0.0.0.0:443:443 jkuif/nagios:latest
 ```
 
 alternatively you can use external Nagios configuration & log data with the following:

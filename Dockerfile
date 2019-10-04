@@ -171,7 +171,7 @@ RUN cd /tmp                                                          && \
         --nagios-cgi-url /cgi-bin                               \
                                                                      && \
     cp share/nagiosgraph.ssi ${NAGIOS_HOME}/share/ssi/common-header.ssi && \
-    cd /tmp && rm -Rf nagiosgraph
+    cd /tmp && rm -Rf nagiosgraph/*
 
 RUN cd /opt                                                                         && \
     pip install pymssql                                                             && \
