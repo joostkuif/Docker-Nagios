@@ -170,8 +170,8 @@ RUN cd /tmp                                                          && \
         --nagios-perfdata-file ${NAGIOS_HOME}/var/perfdata.log  \
         --nagios-cgi-url /cgi-bin                               \
                                                                      && \
-    cp share/nagiosgraph.ssi ${NAGIOS_HOME}/share/ssi/common-header.ssi && \
-    cd /tmp && rm -Rf nagiosgraph/*
+    cp share/nagiosgraph.ssi ${NAGIOS_HOME}/share/ssi/common-header.ssi
+    #cd /tmp && rm -Rf nagiosgraph/*
 
 RUN cd /opt                                                                         && \
     pip install pymssql                                                             && \
