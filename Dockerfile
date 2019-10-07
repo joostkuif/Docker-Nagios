@@ -197,8 +197,8 @@ RUN cp /etc/apache2/sites-available/default-ssl.conf /etc/apache2/sites-enabled/
     export DOC_ROOT="DocumentRoot $(echo $NAGIOS_HOME/share)"                                               && \
     sed -i "s,ServerAdmin.*,joost.kuif@gmail.com," /etc/apache2/sites-enabled/ssl.conf                && \
     sed -i "s,DocumentRoot.*,$DOC_ROOT," /etc/apache2/sites-enabled/ssl.conf                                && \
-    sed -i "s,SSLCertificateFile.*,/opt/nagios/etc/ssl-cert.pem," /etc/apache2/sites-enabled/ssl.conf      && \
-    sed -i "s,SSLCertificateKeyFile.*,/opt/nagios/etc/ssl-cert.key," /etc/apache2/sites-enabled/ssl.conf
+    sed -i "s,SSLCertificateFile.*,/opt/nagios/etc/nagios_nexus-nederland_nl.pem," /etc/apache2/sites-enabled/ssl.conf      && \
+    sed -i "s,SSLCertificateKeyFile.*,/opt/nagios/etc/nagios_nexus-nederland_nl.key," /etc/apache2/sites-enabled/ssl.conf
 
 RUN mkdir -p -m 0755 /usr/share/snmp/mibs                     && \
     mkdir -p         ${NAGIOS_HOME}/etc/conf.d                && \
