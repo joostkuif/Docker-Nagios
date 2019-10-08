@@ -92,7 +92,7 @@ RUN apt-get install -y    \
         snmp-mibs-downloader                \
         unzip                               \
         python                              \
-        lsb-release gnupg libc6 libyaml-perl alien libaio1
+        lsb-release gnupg libc6 libyaml-perl alien libaio1 vim net-tools
 
 RUN ( egrep -i "^${NAGIOS_GROUP}"    /etc/group || groupadd $NAGIOS_GROUP    )                         && \
     ( egrep -i "^${NAGIOS_CMDGROUP}" /etc/group || groupadd $NAGIOS_CMDGROUP )
@@ -187,18 +187,16 @@ RUN cd /tmp                                                          && \
 
 
 RUN sed -i.bak 's/.*\=www\-data//g' /etc/apache2/envvars
-RUN export DOC_ROOT="DocumentRoot $(echo $NAGIOS_HOME/share)"                         && \
-    sed -i "s,DocumentRoot.*,$DOC_ROOT," /etc/apache2/sites-enabled/000-default.conf  && \
-    sed -i "s,</VirtualHost>,<IfDefine ENABLE_USR_LIB_CGI_BIN>\nScriptAlias /cgi-bin/ ${NAGIOS_HOME}/sbin/\n</IfDefine>\n</VirtualHost>," /etc/apache2/sites-enabled/000-default.conf  && \
+RUN echo -e "<VirtualHost *:80>\nServerName nagios.nexus-nederland.nl\nRedirect / https://nagios.nexus-nederland.nl\n</VirtualHost>" > /etc/apache2/sites-enabled/000-default.conf && \
     ln -s /etc/apache2/mods-available/cgi.load /etc/apache2/mods-enabled/cgi.load
 
 #apache ssl
-RUN cp /etc/apache2/sites-available/default-ssl.conf /etc/apache2/sites-enabled/ssl.conf                    && \
-    export DOC_ROOT="DocumentRoot $(echo $NAGIOS_HOME/share)"                                               && \
-    sed -i "s,ServerAdmin.*,joost.kuif@gmail.com," /etc/apache2/sites-enabled/ssl.conf                && \
-    sed -i "s,DocumentRoot.*,$DOC_ROOT," /etc/apache2/sites-enabled/ssl.conf                                && \
-    sed -i "s,SSLCertificateFile.*,/opt/nagios/etc/nagios_nexus-nederland_nl.pem," /etc/apache2/sites-enabled/ssl.conf      && \
-    sed -i "s,SSLCertificateKeyFile.*,/opt/nagios/etc/nagios_nexus-nederland_nl.key," /etc/apache2/sites-enabled/ssl.conf
+RUN cp /etc/apache2/sites-available/default-ssl.conf /etc/apache2/sites-enabled/ssl.conf                                                     && \
+    sed -i "s,ServerAdmin.*,ServerAdmin joost.kuif@gmail.com," /etc/apache2/sites-enabled/ssl.conf                                           && \
+    sed -i "s,DocumentRoot.*,DocumentRoot $NAGIOS_HOME/share," /etc/apache2/sites-enabled/ssl.conf                                           && \
+    sed -i "s,SSLCertificateFile.*,SSLCertificateFile /opt/nagios/etc/nagios_nexus-nederland_nl.pem," /etc/apache2/sites-enabled/ssl.conf    && \
+    sed -i "s,SSLCertificateKeyFile.*,SSLCertificateKeyFile /opt/nagios/etc/nagios_nexus-nederland_nl.key," /etc/apache2/sites-enabled/ssl.conf && \
+    sed -i "s,#SSLCertificateChainFile.*,SSLCertificateChainFile /opt/nagios/etc/TrustProviderBVTLSRSACAG1_cer_X509Cert.cer," /etc/apache2/sites-enabled/ssl.conf
 
 RUN mkdir -p -m 0755 /usr/share/snmp/mibs                     && \
     mkdir -p         ${NAGIOS_HOME}/etc/conf.d                && \
@@ -235,6 +233,7 @@ RUN a2enmod session         && \
     a2enmod session_crypto  && \
     a2enmod auth_form       && \
     a2enmod request         && \
+    a2enmod ssl             && \
     a2enmod ldap
 
 RUN chmod +x /usr/local/bin/start_nagios        && \
@@ -255,14 +254,12 @@ RUN ln -s /etc/sv/* /etc/service
 ENV APACHE_LOCK_DIR /var/run
 ENV APACHE_LOG_DIR /var/log/apache2
 
-#Set ServerName and timezone for Apache
+#Set ServerName for Apache
 RUN echo "ServerName ${NAGIOS_FQDN}" > /etc/apache2/conf-available/servername.conf    && \
-    echo "PassEnv TZ" > /etc/apache2/conf-available/timezone.conf            && \
-    ln -s /etc/apache2/conf-available/servername.conf /etc/apache2/conf-enabled/servername.conf    && \
-    ln -s /etc/apache2/conf-available/timezone.conf /etc/apache2/conf-enabled/timezone.conf
+    ln -s /etc/apache2/conf-available/servername.conf /etc/apache2/conf-enabled/servername.conf
 
 
-VOLUME "${NAGIOS_HOME}/var" "${NAGIOS_HOME}/etc" "/var/log/apache2" "/opt/Custom-Nagios-Plugins" "/opt/nagiosgraph/var" "/opt/nagiosgraph/etc"
+VOLUME "${NAGIOS_HOME}/var" "${NAGIOS_HOME}/etc" "/var/log/apache2" "/opt/custom-nagios-plugins" "/opt/nagiosgraph/var" "/opt/nagiosgraph/etc"
 
 #In deze oracleinstall worden ook packages geinstaleerd maar daar falen ze, ze zijn daarom in de grote apt-get install (bovenin dit script) toegevoegd
 RUN cd /opt/oracle                                                                         && \
