@@ -187,13 +187,16 @@ RUN cd /tmp                                                          && \
 
 
 RUN sed -i.bak 's/.*\=www\-data//g' /etc/apache2/envvars
-RUN echo -e "<VirtualHost *:80>\nServerName nagios.nexus-nederland.nl\nRedirect / https://nagios.nexus-nederland.nl\n</VirtualHost>" > /etc/apache2/sites-enabled/000-default.conf && \
+RUN echo "<VirtualHost *:80>\n\
+  ServerName ${NAGIOS_FQDN}\n\
+  Redirect / https://${NAGIOS_FQDN}\n\
+</VirtualHost>" > /etc/apache2/sites-enabled/000-default.conf && \
     ln -s /etc/apache2/mods-available/cgi.load /etc/apache2/mods-enabled/cgi.load
 
 #apache ssl
 RUN cp /etc/apache2/sites-available/default-ssl.conf /etc/apache2/sites-enabled/ssl.conf                                                     && \
     sed -i "s,ServerAdmin.*,ServerAdmin joost.kuif@gmail.com," /etc/apache2/sites-enabled/ssl.conf                                           && \
-    sed -i "s,DocumentRoot.*,DocumentRoot $NAGIOS_HOME/share," /etc/apache2/sites-enabled/ssl.conf                                           && \
+    sed -i "s,DocumentRoot.*,DocumentRoot ${NAGIOS_HOME}/share," /etc/apache2/sites-enabled/ssl.conf                                           && \
     sed -i "s,SSLCertificateFile.*,SSLCertificateFile /opt/nagios/etc/nagios_nexus-nederland_nl.pem," /etc/apache2/sites-enabled/ssl.conf    && \
     sed -i "s,SSLCertificateKeyFile.*,SSLCertificateKeyFile /opt/nagios/etc/nagios_nexus-nederland_nl.key," /etc/apache2/sites-enabled/ssl.conf && \
     sed -i "s,#SSLCertificateChainFile.*,SSLCertificateChainFile /opt/nagios/etc/TrustProviderBVTLSRSACAG1_cer_X509Cert.cer," /etc/apache2/sites-enabled/ssl.conf
@@ -264,17 +267,17 @@ VOLUME "${NAGIOS_HOME}/var" "${NAGIOS_HOME}/etc" "/var/log/apache2" "/opt/custom
 #In deze oracleinstall worden ook packages geinstaleerd maar daar falen ze, ze zijn daarom in de grote apt-get install (bovenin dit script) toegevoegd
 RUN cd /opt/oracle                                                                         && \
     wget https://assets.nagios.com/downloads/general/scripts/oracleinstall.sh              && \
-    chmod +x oracleinstall.sh
-
-RUN cd /opt/oracle                                                                         && \
+    chmod +x oracleinstall.sh                                                              && \
     bash ./oracleinstall.sh
 
-RUN apt-get upgrade -y
-
-RUN apt-get clean && rm -Rf /var/lib/apt/lists/*
+#upgrade and cleanup
+RUN apt-get upgrade -y && \
+   apt-get clean && \
+   rm -Rf /var/lib/apt/lists/*
 
 #workaround for missing /var/run/samba/msg.lock dir
-RUN net status sessions
+RUN net status sessions && \
+   chmod +wx /var/run/samba/msg.lock
 
 EXPOSE 80 443
 
