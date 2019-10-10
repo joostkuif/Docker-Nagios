@@ -274,7 +274,7 @@ RUN apt-get upgrade -y
 RUN apt-get clean && rm -Rf /var/lib/apt/lists/*
 
 #workaround for missing /var/run/samba/msg.lock dir
-RUN net rpc
+RUN net status sessions
 
 EXPOSE 80 443
 
