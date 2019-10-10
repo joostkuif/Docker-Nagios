@@ -6,7 +6,7 @@ ENV NAGIOS_USER            nagios
 ENV NAGIOS_GROUP           nagios
 ENV NAGIOS_CMDUSER         nagios
 ENV NAGIOS_CMDGROUP        nagios
-ENV NAGIOS_FQDN            nagios.example.com
+ENV NAGIOS_FQDN            nagios.nexus-nederland.nl
 ENV NAGIOSADMIN_USER       nagiosadmin
 ENV NAGIOSADMIN_PASS       nagios
 ENV APACHE_RUN_USER        nagios
