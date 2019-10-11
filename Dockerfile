@@ -11,7 +11,7 @@ ENV NAGIOSADMIN_USER       nagiosadmin
 ENV NAGIOSADMIN_PASS       nagios
 ENV APACHE_RUN_USER        nagios
 ENV APACHE_RUN_GROUP       nagios
-ENV NAGIOS_TIMEZONE        UTC
+ENV NAGIOS_TIMEZONE        Europe/Amsterdam
 ENV DEBIAN_FRONTEND        noninteractive
 ENV NG_NAGIOS_CONFIG_FILE  ${NAGIOS_HOME}/etc/nagios.cfg
 ENV NG_CGI_DIR             ${NAGIOS_HOME}/sbin
@@ -223,6 +223,8 @@ RUN rm -rf /etc/sv/getty-5
 
 ADD overlay /
 
+ENV TZ=${NAGIOS_TIMEZONE}
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 RUN echo "use_timezone=${NAGIOS_TIMEZONE}" >> ${NAGIOS_HOME}/etc/nagios.cfg
 
 # Copy example config in-case the user has started with empty var or etc
