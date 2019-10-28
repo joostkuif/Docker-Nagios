@@ -13,13 +13,15 @@ services:
     volumes:
     - nagiosetc:/opt/nagios/etc
     - nagiosvar:/opt/nagios/var
-    - customplugins:/opt/Custom-Nagios-Plugins
+    - nagioscerts:/opt/nagios/certs
+    - customplugins:/opt/custom-nagios-plugins
     - nagiosgraphvar:/opt/nagiosgraph/var
     - nagiosgraphetc:/opt/nagiosgraph/etc
 
 volumes:
     nagiosetc:
     nagiosvar:
+    nagioscerts:
     customplugins:
     nagiosgraphvar:
     nagiosgraphetc:

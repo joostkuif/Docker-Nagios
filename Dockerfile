@@ -197,9 +197,9 @@ RUN echo "<VirtualHost *:80>\n\
 RUN cp /etc/apache2/sites-available/default-ssl.conf /etc/apache2/sites-enabled/ssl.conf                                                     && \
     sed -i "s,ServerAdmin.*,ServerAdmin joost.kuif@gmail.com," /etc/apache2/sites-enabled/ssl.conf                                           && \
     sed -i "s,DocumentRoot.*,DocumentRoot ${NAGIOS_HOME}/share," /etc/apache2/sites-enabled/ssl.conf                                           && \
-    sed -i "s,SSLCertificateFile.*,SSLCertificateFile /opt/nagios/etc/nagios_nexus-nederland_nl.pem," /etc/apache2/sites-enabled/ssl.conf    && \
-    sed -i "s,SSLCertificateKeyFile.*,SSLCertificateKeyFile /opt/nagios/etc/nagios_nexus-nederland_nl.key," /etc/apache2/sites-enabled/ssl.conf && \
-    sed -i "s,#SSLCertificateChainFile.*,SSLCertificateChainFile /opt/nagios/etc/TrustProviderBVTLSRSACAG1_cer_X509Cert.cer," /etc/apache2/sites-enabled/ssl.conf
+    sed -i "s,SSLCertificateFile.*,SSLCertificateFile /opt/nagios/certs/nagios_nexus-nederland_nl.pem," /etc/apache2/sites-enabled/ssl.conf    && \
+    sed -i "s,SSLCertificateKeyFile.*,SSLCertificateKeyFile /opt/nagios/certs/nagios_nexus-nederland_nl.key," /etc/apache2/sites-enabled/ssl.conf && \
+    sed -i "s,#SSLCertificateChainFile.*,SSLCertificateChainFile /opt/nagios/certs/TrustProviderBVTLSRSACAG1_cer_X509Cert.cer," /etc/apache2/sites-enabled/ssl.conf
 
 RUN mkdir -p -m 0755 /usr/share/snmp/mibs                     && \
     mkdir -p         ${NAGIOS_HOME}/etc/conf.d                && \
@@ -264,7 +264,7 @@ RUN echo "ServerName ${NAGIOS_FQDN}" > /etc/apache2/conf-available/servername.co
     ln -s /etc/apache2/conf-available/servername.conf /etc/apache2/conf-enabled/servername.conf
 
 
-VOLUME "${NAGIOS_HOME}/var" "${NAGIOS_HOME}/etc" "/var/log/apache2" "/opt/custom-nagios-plugins" "/opt/nagiosgraph/var" "/opt/nagiosgraph/etc"
+VOLUME "${NAGIOS_HOME}/var" "${NAGIOS_HOME}/etc" "${NAGIOS_HOME}/certs" "/var/log/apache2" "/opt/custom-nagios-plugins" "/opt/nagiosgraph/var" "/opt/nagiosgraph/etc"
 
 #In deze oracleinstall worden ook packages geinstaleerd maar daar falen ze, ze zijn daarom in de grote apt-get install (bovenin dit script) toegevoegd
 RUN cd /opt/oracle                                                                         && \
