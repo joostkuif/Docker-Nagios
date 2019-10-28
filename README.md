@@ -30,6 +30,7 @@ alternatively you can use external Nagios configuration & log data with the foll
 docker run --name nagios4  \
   -v /path-to-nagios/etc/:/opt/nagios/etc/ \
   -v /path-to-nagios/var:/opt/nagios/var/ \
+  -v /path-to-nagios/certs:/opt/nagios/certs/ \
   -v /path-to-custom-plugins:/opt/Custom-Nagios-Plugins \
   -v /path-to-nagiosgraph-var:/opt/nagiosgraph/var \
   -v /path-to-nagiosgraph-etc:/opt/nagiosgraph/etc \
