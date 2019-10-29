@@ -239,6 +239,7 @@ RUN a2enmod session         && \
     a2enmod auth_form       && \
     a2enmod request         && \
     a2enmod ssl             && \
+    a2enmod authnz_ldap     && \
     a2enmod ldap
 
 RUN chmod +x /usr/local/bin/start_nagios        && \
@@ -263,8 +264,11 @@ ENV APACHE_LOG_DIR /var/log/apache2
 RUN echo "ServerName ${NAGIOS_FQDN}" > /etc/apache2/conf-available/servername.conf    && \
     ln -s /etc/apache2/conf-available/servername.conf /etc/apache2/conf-enabled/servername.conf
 
+#Link apache2 configuration from outside
+#RUN touch /etc/apache2/conf-available/nagios.conf    && \
+#    ln -s /etc/apache2/conf-available/nagios.conf /etc/apache2/conf-enabled/nagios.conf
 
-VOLUME "${NAGIOS_HOME}/var" "${NAGIOS_HOME}/etc" "${NAGIOS_HOME}/certs" "/var/log/apache2" "/opt/custom-nagios-plugins" "/opt/nagiosgraph/var" "/opt/nagiosgraph/etc"
+VOLUME "${NAGIOS_HOME}/var" "${NAGIOS_HOME}/etc" "${NAGIOS_HOME}/certs" "${NAGIOS_HOME}/apache2" "/var/log/apache2" "/opt/custom-nagios-plugins" "/opt/nagiosgraph/var" "/opt/nagiosgraph/etc"
 
 #In deze oracleinstall worden ook packages geinstaleerd maar daar falen ze, ze zijn daarom in de grote apt-get install (bovenin dit script) toegevoegd
 RUN cd /opt/oracle                                                                         && \
@@ -283,4 +287,4 @@ RUN net status sessions && \
 
 EXPOSE 80 443
 
-CMD [ "/usr/local/bin/start_nagios" ]
+CMD [ "cp ${NAGIOS_HOME}/apache2/nagios.conf /etc/apache2/conf-available/nagios.conf", "/usr/local/bin/start_nagios" ]
