@@ -287,4 +287,4 @@ RUN net status sessions && \
 
 EXPOSE 80 443
 
-CMD [ "cp ${NAGIOS_HOME}/apache2/nagios.conf /etc/apache2/conf-available/nagios.conf", "/usr/local/bin/start_nagios" ]
+CMD [ "cp /opt/nagios/apache2/nagios.conf /etc/apache2/conf-available/nagios.conf", "/usr/local/bin/start_nagios" ]
