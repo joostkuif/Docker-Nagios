@@ -92,7 +92,7 @@ RUN apt-get install -y    \
         snmp-mibs-downloader                \
         unzip                               \
         python                              \
-        lsb-release gnupg libc6 libyaml-perl alien libaio1 vim net-tools
+        lsb-release gnupg libc6 libyaml-perl alien libaio1 vim net-tools dos2unix
 
 RUN ( egrep -i "^${NAGIOS_GROUP}"    /etc/group || groupadd $NAGIOS_GROUP    )                         && \
     ( egrep -i "^${NAGIOS_CMDGROUP}" /etc/group || groupadd $NAGIOS_CMDGROUP )
