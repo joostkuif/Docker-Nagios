@@ -275,7 +275,8 @@ VOLUME "${NAGIOS_HOME}/var" "${NAGIOS_HOME}/etc" "${NAGIOS_HOME}/certs" "${NAGIO
 RUN cd /opt/oracle                                                                         && \
     wget https://assets.nagios.com/downloads/general/scripts/oracleinstall.sh              && \
     chmod +x oracleinstall.sh                                                              && \
-    bash ./oracleinstall.sh
+    bash ./oracleinstall.sh                                                                && \
+    ldconfig -v
 
 #upgrade and cleanup
 RUN apt-get upgrade -y && \
