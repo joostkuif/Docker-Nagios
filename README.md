@@ -4,7 +4,7 @@ Docker image for Nagios
 
 Build Status: [![Build Status](https://travis-ci.org/joostkuif/Docker-Nagios.svg?branch=master)](https://travis-ci.org/joostkuif/Docker-Nagios)
 
-Nagios Core 4.4.5 running on Ubuntu 16.04 LTS with NagiosGraph & NRPE & Oracle client & SSL
+Nagios Core 4.4.5 running on Ubuntu 16.04 LTS with NagiosGraph & NRPE & Oracle client & SSL & LDAP Auth
 
 ### Configurations
 Nagios Configuration lives in /opt/nagios/etc
@@ -18,19 +18,15 @@ docker pull jkuif/nagios:latest
 
 ### Running
 
-Run with the example configuration with the following:
-
-```sh
-docker run --name nagios4 -p 0.0.0.0:80:80 -p 0.0.0.0:443:443 jkuif/nagios:latest
-```
-
-alternatively you can use external Nagios configuration & log data with the following:
+Run with the external Nagios configuration & log data with the following:
 
 ```sh
 docker run --name nagios4  \
-  -v /path-to-nagios/etc/:/opt/nagios/etc/ \
-  -v /path-to-nagios/var:/opt/nagios/var/ \
-  -v /path-to-nagios/certs:/opt/nagios/certs/ \
+  -v /path-to-nagios/var:/opt/nagios/var \
+  -v /path-to-nagios/etc:/opt/nagios/etc \
+  -v /path-to-nagios/certs:/opt/nagios/certs \
+  -v /path-to-apache2-config:/opt/nagios/apache2 \
+  -v /path-to-apache-log-dir:/var/log/apache2 \
   -v /path-to-custom-plugins:/opt/Custom-Nagios-Plugins \
   -v /path-to-nagiosgraph-var:/opt/nagiosgraph/var \
   -v /path-to-nagiosgraph-etc:/opt/nagiosgraph/etc \
@@ -50,16 +46,9 @@ There are a number of environment variables that you can use to adjust the behav
 
 For best results your Nagios image should have access to both IPv4 & IPv6 networks 
 
-#### Credentials
-
-The default credentials for the web interface is `nagiosadmin` / `nagios`
 
 ### Extra Plugins
 
 * Nagios nrpe [<http://exchange.nagios.org/directory/Addons/Monitoring-Agents/NRPE--2D-Nagios-Remote-Plugin-Executor/details>]
 * Nagiosgraph [<http://exchange.nagios.org/directory/Addons/Graphing-and-Trending/nagiosgraph/details>]
-* JR-Nagios-Plugins -  custom plugins from Jason Rivers [<https://github.com/JasonRivers/nagios-plugins>]
-* WL-Nagios-Plugins -  custom plugins from William Leibzon [<https://github.com/willixix/WL-NagiosPlugins>]
-* JE-Nagios-Plugins -  custom plugins from Justin Ellison [<https://github.com/justintime/nagios-plugins>]
-
 
