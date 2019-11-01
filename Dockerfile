@@ -265,8 +265,9 @@ RUN echo "ServerName ${NAGIOS_FQDN}" > /etc/apache2/conf-available/servername.co
     ln -s /etc/apache2/conf-available/servername.conf /etc/apache2/conf-enabled/servername.conf
 
 #Link apache2 configuration from outside
-RUN ln -s /opt/nagios/apache2/nagios.conf /etc/apache2/conf-available/nagios.conf && \
-    ln -s /etc/apache2/conf-available/nagios.conf /etc/apache2/conf-enabled/nagios.conf
+RUN rm /etc/apache2/sites-available/nagios.conf && \
+    ln -s /opt/nagios/apache2/nagios.conf /etc/apache2/sites-available/nagios.conf && \
+    ln -s /etc/apache2/sites-available/nagios.conf /etc/apache2/sites-enabled/nagios.conf
 
 VOLUME "${NAGIOS_HOME}/var" "${NAGIOS_HOME}/etc" "${NAGIOS_HOME}/certs" "${NAGIOS_HOME}/apache2" "/var/log/apache2" "/opt/custom-nagios-plugins" "/opt/nagiosgraph/var" "/opt/nagiosgraph/etc"
 
